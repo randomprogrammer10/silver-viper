@@ -12,14 +12,12 @@ class InfluxDBManager:
     @classmethod
     def post_data(cls, data_dict):
         payload = cls.format_influxdb_body(data_dict)
-        response = requests.post(cls.DB_URL, params=cls.POST_PARAMS, data=payload)
-        response.raise_for_status()
-        return
+        return requests.post(cls.DB_URL, params=cls.POST_PARAMS, data=payload)
 
     @classmethod
     def format_influxdb_body(cls, payload):
-        formatted_str_body = "{},".format(cls.TABLE_NAME)
+        formatted_str_body = "{} ".format(cls.TABLE_NAME)
         for key, val in payload.items():
-            formatted_str_body += "{}={} ".format(key, val)
+            formatted_str_body += "{}={},".format(key, val)
 
-        return formatted_str_body
+        return formatted_str_body[:-1]

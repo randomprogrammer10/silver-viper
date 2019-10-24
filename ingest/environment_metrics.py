@@ -8,40 +8,43 @@ from enviroplus import gas
 class EnvironmentMetrics:
     # Adjust this to calibrate temperature
     TEMP_TUNING_FACTOR = 0.8
-    # BME280 temperature/pressure/humidity sensor
-    BME280 = BME280()
-    # LTR559 light sensor
-    LTR559 = LTR559()
+    # bme280 temperature/pressure/humidity sensor
+    BME280_INSTANCE = BME280()
+    # ltr559 light sensor
+    LTR559_INSTANCE = LTR559()
     # PMS5003 data from air quality sensor
-    PMS5003 = PMS5003()
+    PMS5003_INSTANCE = PMS5003()
 
-    # Get the temperature of the CPU for compensation
-    def get_cpu_temperature():
+    def __init__(self):
+        pass
+
+    @classmethod
+    def get_cpu_temperature(cls):
         process = Popen(['vcgencmd', 'measure_temp'], stdout=PIPE, universal_newlines=True)
         output, _error = process.communicate()
         return float(output[output.index('=') + 1:output.rindex("'")])
 
-
-    def calibrated_temp():
-        cpu_temp = get_cpu_temperature()
-        cpu_temps = [get_cpu_temperature()] * 5
+    @classmethod
+    def calibrated_temp(cls):
+        cpu_temp = cls.get_cpu_temperature()
+        cpu_temps = [cls.get_cpu_temperature()] * 5
 
         # Smooth out with some averaging to decrease jitter
         cpu_temps = cpu_temps[1:] + [cpu_temp]
         avg_cpu_temp = sum(cpu_temps) / float(len(cpu_temps))
 
-        raw_temp = BME280.get_temperature()
-        data = raw_temp - ((avg_cpu_temp - raw_temp) / TEMP_TUNING_FACTOR)
+        raw_temp = cls.BME280_INSTANCE.get_temperature()
+        data = raw_temp - ((avg_cpu_temp - raw_temp) / cls.TEMP_TUNING_FACTOR)
         return data
 
-
-    def build_metrics_dict():
-        pms_data = PMS5003.read()
+    @classmethod
+    def build_metrics_dict(cls):
+        pms_data = cls.PMS5003_INSTANCE.read()
         return {
-            "temperature": calibrated_temp(),
-            "pressure": BME280.get_pressure(),
-            "humidity": BME280.get_humidity(),
-            "light": LTR559.get_lux(),
+            "temperature": cls.calibrated_temp(),
+            "pressure": cls.BME280_INSTANCE.get_pressure(),
+            "humidity": cls.BME280_INSTANCE.get_humidity(),
+            "light": cls.LTR559_INSTANCE.get_lux(),
             "gas_oxidizing": gas.read_oxidising(),
             "gas_reducing": gas.read_reducing(),
             "gas_nh3": gas.read_nh3(),
