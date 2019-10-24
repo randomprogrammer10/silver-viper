@@ -4,6 +4,14 @@
 
 ## Ingestor
 
+### InfluxDB
+
+We are using InfluxDB to store the time series data.  You can can connect to the local InfluxDB by running the following command on the Pi:
+
+```bash
+$ influx -host 127.0.0.1 -port 8086 -database silverviper
+```
+
 ## Back-End API
 
 To run the back-end server, do the following:
