@@ -5,106 +5,160 @@
     <meta charset="utf-8">
     <style type="text/css">
         /* Style Charts Here */
-        .axis {
-            font-family: sans-serif;
-            fill: #d35400;
-            font-size: 12px;
-        }
-
         .line {
             fill: none;
-            stroke: #f1c40f;
-            stroke-width: 3px;
+            stroke: steelblue;
+            stroke-width: 1.5px;
         }
 
-        .smoothline {
-            fill: none;
-            stroke: #e74c3c;
-            stroke-width: 3px;
-        }
-
-        .circle {
-            stroke: #e74c3c;
-            stroke-width: 3px;
-            fill: #FFF;
-        }
-
-        .grid {
-            stroke: #DDD;
-            stroke-width: 1px;
-            fill: none;
+        .legenditem {
+            float: left;
+            padding-right: 10px;
         }
     </style>
 </head>
 
 <body>
-    <svg id="chart"></svg>
+    <div id="legend" class="legend"></div>
+    <br>
+    <svg width="960" height="500" id="chart"></svg>
 
     <script src="js-libs/d3/d3.min.js"></script>
     <script>
-        var data = [];
-        var margin = { top: 20, right: 20, bottom: 30, left: 20 }
-        var width = window.innerWidth - margin.left - margin.right;
-        var height = window.innerHeight - margin.top - margin.bottom;
-        var globalX = 0;
-        var duration = width;
-        var max = width;
-        var step = 20;
-        var chart = d3.select('#chart')
-            .attr('width', width + 50)
-            .attr('height', height + 50);
-        var x = d3.scaleLinear().domain([0, width]).range([0, width]);
-        var y = d3.scaleLinear().domain([0, width]).range([height, 0]);
-        // -----------------------------------
+         var t = setInterval(updateChart, 1000);
+
+        var svg = d3.select("#chart"),
+            margin = {
+                top: 5,
+                right: 5,
+                bottom: 50,
+                left: 30
+            },
+            width = Math.floor(svg.attr("width") - margin.left - margin.right),
+            height = Math.floor(svg.attr("height") - margin.top - margin.bottom);
+
+        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        g.append("defs").append("clipPath")
+            .attr("id", "clip2")
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", height);
+
+        var parseTime = d3.timeParse("%Y%m%d");
+
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = d3.scaleOrdinal(d3.schemeCategory10);
+
+        y.domain([0, 30]);
+
         var line = d3.line()
-            .x(function (d) { return x(d.x); })
-            .y(function (d) { return y(d.y); });
-        var smoothLine = d3.line().curve(d3.curveCardinal)
-            .x(function (d) { return x(d.x); })
-            .y(function (d) { return y(d.y); });
-        // -----------------------------------
+            .curve(d3.curveBasis)
+            .x(function (d) {
+                return x(d.date);
+            })
+            .y(function (d) {
+                return y(d.speed);
+            });
 
-        // Draw the axis
-        var xAxis = d3.axisBottom().scale(x);
-        var axisX = chart.append('g').attr('class', 'x axis')
-            .attr('transform', 'translate(0, '+ height +')')
-            .call(xAxis);
-            
-        // Append the holder for line chart and fill area
-        var path = chart.append('path');
+        let dta = [
+            { id: "data1", values: [] },
+            { id: "data2", values: [] },
+            { id: "data3", values: [] },
+            { id: "data4", values: [] }
+        ];
 
-        // Main loop
-        function tick() {
-            // Generate new data
-            var point = {
-                x: globalX,
-                y: ((Math.random() * height + 50) >> 0)
-            };
-            data.push(point);
-            globalX += step;
+        z.domain(dta.map(function (c) {
+            return c.id;
+        }));
 
-            // Draw new line
-            path.datum(data)
-                .attr('class', 'smoothline')
-                .attr('d', smoothLine);
+        var x_axis = d3.axisBottom()
+            .scale(x);
+        var x_axis_svg = g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")");
 
-            // Shift the chart left
-            x.domain([globalX - (max - step), globalX]);
-            axisX.transition()
-                .duration(duration)
-                .ease(d3.easeLinear, 2)
-                .call(xAxis);
+        x_axis_svg.call(x_axis);
 
-            path.attr('transform', null)
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("fill", "#000")
+            .text("Speed");
+
+        let pathsG = g.append("g").attr("id", "paths").attr("class", "paths")
+            .attr("clip-path", "url(#clip2)");
+
+        let globalX = 0;
+        let duration = 1000; //how quickly to move (will look jerky if less that data input rate)
+        let limit = 60; // how many datapoints, total points = (duration * limit)
+
+        function updateChart() {
+
+            let now = new Date();
+            dta.forEach((e) => {
+                let last = e.values.length ? e.values[e.values.length - 1].speed : 10;
+                let newv = Math.round(Math.min(30, Math.max(0, last + (Math.random() * 6) - 3)));
+                e.values.push({
+                    date: now,
+                    speed: newv
+                });
+            });
+
+            // Shift domain
+            x.domain([now - ((limit - 2) * duration), now - duration])
+            // Slide x-axis left
+            x_axis_svg.transition().duration(duration).ease(d3.easeLinear, 2).call(x_axis);
+
+            //Join
+            var g = pathsG.selectAll(".minerLine").data(dta);
+            var gEnter = g.enter()
+                //Enter
+                .append("g")
+                .attr("class", "minerLine")
+                .merge(g);
+
+            //Join
+            var svg = g.selectAll("path").data(function (d) {
+                return [d];
+            });
+            svg.enter()
+                //Enter
+                .append("path").attr("class", "line")
+                .style("stroke", function (d) {
+                    return z(d.id);
+                })
+                .merge(svg)
+                //Update
                 .transition()
                 .duration(duration)
                 .ease(d3.easeLinear, 2)
-                .attr('transform', 'translate(' + x(globalX - max) + ')')
-                .on('end', tick)
-            // Remote old data (max 50 points)
-            if (data.length > width) data.shift();
+                .attr("d", function (d) {
+                    return line(d.values)
+                })
+                .attr("transform", null)
+
+            var text = d3.select("#legend").selectAll("div").data(dta)
+            text.enter()
+                .append("div")
+                .attr("class", "legenditem")
+                .style("color", function (d) {
+                    return z(d.id);
+                })
+                .merge(text)
+                .text(function (d) {
+                    return d.id + ":" + d.values[d.values.length - 1].speed;
+                })
+
         }
-        tick();
+      </script>
 
     </script>
 </body>
