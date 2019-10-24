@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/json'
 require 'time'
 
 require_relative 'data_controller'
@@ -15,11 +16,11 @@ get '/data' do
   metrics = params[:metrics]
   return 422 unless controller.valid_metrics?(metrics)
 
-  start_time = Time.parse(params[:start_time]).to_i
-  stop_time = Time.parse(params[:stop_time]).to_i
+  start_time = Time.at(params[:start_time].to_i).to_datetime
+  stop_time = Time.at(params[:stop_time].to_i).to_datetime
   return 422 unless controller.valid_timestamps?(start_time, stop_time)
 
-  return controller.fetch_data(start_time, stop_time, metrics)
+  json controller.fetch_data(start_time, stop_time, metrics)
 rescue StandardError
   return 422
 end
