@@ -1,3 +1,7 @@
+require 'date'
+
+require_relative 'influx_client'
+
 class DataController
   TEMPERATURE = 'temperature'.freeze
   NOISE = 'noise'.freeze
@@ -14,13 +18,17 @@ class DataController
     metrics.all? { |metric| VALID_METRICS.include?(metric) }
   end
 
-  def valid_timestamp?(start_time, stop_time)
+  def valid_timestamps?(start_time, stop_time)
     return false if start_time.nil? || stop_time.nil?
-    return false unless start_time.to_time < stop_time.to_time && start_time.to_time < Time.Now && stop_time.to_time < Time.Now
+    return true if start_time < stop_time && stop_time <= DateTime.now
+    return false
   end
 
   def fetch_data(start_time, stop_time, metrics=nil)
     metrics = VALID_METRICS if metrics.nil?
-    InfluxClient.new.get_weather_metric_data(metrics, start_time, stop_time)
+    result = InfluxClient.new.get_metrics_data(metrics, start_time, stop_time)
+
+    # Return only the data values, none of the other metadata
+    return result[0]['values']
   end
 end

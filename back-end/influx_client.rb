@@ -1,28 +1,30 @@
 require 'influxdb'
 
 class InfluxClient
-
+  #HOST = '172.16.83.35'.freeze
   HOST = 'localhost'.freeze
   PORT = '8086'.freeze
-  RETRY_COUNT = '3'.freeze
-  TIME_OUT = '10'.freeze
+  RETRY_COUNT = 3
+  TIME_OUT = 10
   DB_NAME = 'silverviper'.freeze
   TABLE_NAME = 'weather_metrics'.freeze
 
   def initialize
-    @url = "https://#{HOST}:#{PORT}/#{DB_NAME}?retry=#{RETRY_COUNT}"
+    url = "http://#{HOST}:#{PORT}/#{DB_NAME}?retry=#{RETRY_COUNT}"
     @influxdb = InfluxDB::Client.new url: url, open_timeout: TIME_OUT
   end
 
-  def get_weather_metric_data(metrics, start, stop)
-    select_query = generate_query_select_string(metrics.join(','))
-    query_string = generate_query_string(select_query, start, stop)
-    influxdb.query query_string
+  def get_metrics_data(metrics, start, stop)
+    query_string = generate_query_string(metrics.join(','), start, stop)
+    @influxdb.query(query_string)
   end
 
   private
 
   def generate_query_string(select_query, start, stop)
-    query_string = "SELECT #{select_query} from #{TABLE_NAME} WHERE TIME BETWEEN #{start} AND #{stop}"
+    start = start.strftime('%Q').to_i * 1000000
+    stop = stop.strftime('%Q').to_i * 1000000
+
+    "SELECT #{select_query} from #{TABLE_NAME} WHERE TIME > #{start} AND TIME <= #{stop}"
   end
 end
