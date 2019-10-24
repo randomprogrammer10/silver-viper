@@ -4,7 +4,7 @@ import requests
 class InfluxDBManager:
     DB_URL = 'http://localhost:8086/write'
     TABLE_NAME = 'weather_metrics'
-    POST_PARAMS = { "database": "silverviper" }
+    POST_PARAMS = { "db": "silverviper" }
 
     def __init__(self):
         pass
