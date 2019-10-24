@@ -5,4 +5,5 @@ numpy==1.17.3
 pimoroni-bme280==0.0.2
 pms5003==0.0.4
 pyserial==3.4
+smbus==1.1.post2
 ST7735==0.0.3
