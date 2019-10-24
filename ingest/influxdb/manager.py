@@ -18,6 +18,6 @@ class InfluxDBManager:
     def format_influxdb_body(cls, payload):
         formatted_str_body = "{},".format(cls.TABLE_NAME)
         for key, val in payload.items():
-            formatted_str_body += " {}={}".format(key, val)
+            formatted_str_body += "{}={} ".format(key, val)
 
         return formatted_str_body
