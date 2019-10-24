@@ -1,220 +1,110 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8" >
+    <meta charset="utf-8">
     <style type="text/css">
         /* Style Charts Here */
-        .line {
-            fill: none;
-            stroke: steelblue;
-            stroke-width: 2px;
+        .axis {
+            font-family: sans-serif;
+            fill: #d35400;
+            font-size: 12px;
         }
 
+        .line {
+            fill: none;
+            stroke: #f1c40f;
+            stroke-width: 3px;
+        }
+
+        .smoothline {
+            fill: none;
+            stroke: #e74c3c;
+            stroke-width: 3px;
+        }
+
+        .circle {
+            stroke: #e74c3c;
+            stroke-width: 3px;
+            fill: #FFF;
+        }
+
+        .grid {
+            stroke: #DDD;
+            stroke-width: 1px;
+            fill: none;
+        }
     </style>
 </head>
+
 <body>
+    <svg id="chart"></svg>
 
     <script src="js-libs/d3/d3.min.js"></script>
     <script>
-        // set the dimensions and margins of the graph
-        var margin = { top: 20, right: 20, bottom: 30, left: 50 },
-            width = window.innerWidth - margin.left - margin.right,
-            height = window.innerHeight - margin.top - margin.bottom;
+        var data = [];
+        var margin = { top: 20, right: 20, bottom: 30, left: 20 }
+        var width = window.innerWidth - margin.left - margin.right;
+        var height = window.innerHeight - margin.top - margin.bottom;
+        var globalX = 0;
+        var duration = width;
+        var max = width;
+        var step = 20;
+        var chart = d3.select('#chart')
+            .attr('width', width + 50)
+            .attr('height', height + 50);
+        var x = d3.scaleLinear().domain([0, width]).range([0, width]);
+        var y = d3.scaleLinear().domain([0, width]).range([height, 0]);
+        // -----------------------------------
+        var line = d3.line()
+            .x(function (d) { return x(d.x); })
+            .y(function (d) { return y(d.y); });
+        var smoothLine = d3.line().curve(d3.curveCardinal)
+            .x(function (d) { return x(d.x); })
+            .y(function (d) { return y(d.y); });
+        // -----------------------------------
 
-        // parse the date / time
-        var parseTime = d3.timeParse("%d-%b-%y");
+        // Draw the axis
+        var xAxis = d3.axisBottom().scale(x);
+        var axisX = chart.append('g').attr('class', 'x axis')
+            .attr('transform', 'translate(0, '+ height +')')
+            .call(xAxis);
+            
+        // Append the holder for line chart and fill area
+        var path = chart.append('path');
 
-        // set the ranges
-        var x = d3.scaleTime().range([0, width]);
-        var y = d3.scaleLinear().range([height, 0]);
+        // Main loop
+        function tick() {
+            // Generate new data
+            var point = {
+                x: globalX,
+                y: ((Math.random() * height + 50) >> 0)
+            };
+            data.push(point);
+            globalX += step;
 
-        // define the 1st line
-        var valueline = d3.line()
-            .x(function (d) { return x(d.date); })
-            .y(function (d) { return y(d.close); });
+            // Draw new line
+            path.datum(data)
+                .attr('class', 'smoothline')
+                .attr('d', smoothLine);
 
-        // define the 2nd line
-        var valueline2 = d3.line()
-            .x(function (d) { return x(d.date); })
-            .y(function (d) { return y(d.open); });
+            // Shift the chart left
+            x.domain([globalX - (max - step), globalX]);
+            axisX.transition()
+                .duration(duration)
+                .ease(d3.easeLinear, 2)
+                .call(xAxis);
 
-        // append the svg obgect to the body of the page
-        // appends a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
-        const data = [
-                {
-                    "date": "1-May-12",
-                    "close": 68.13,
-                    "open": 34.12
-                },
-                {
-                    "date": "30-Apr-12",
-                    "close": 63.98,
-                    "open": 45.56
-                },
-                {
-                    "date": "27-Apr-12",
-                    "close": 67,
-                    "open": 67.89
-                },
-                {
-                    "date": "26-Apr-12",
-                    "close": 89.7,
-                    "open": 78.54
-                },
-                {
-                    "date": "25-Apr-12",
-                    "close": 99,
-                    "open": 89.23
-                },
-                {
-                    "date": "24-Apr-12",
-                    "close": 130.28,
-                    "open": 99.23
-                },
-                {
-                    "date": "23-Apr-12",
-                    "close": 166.7,
-                    "open": 101.34
-                },
-                {
-                    "date": "20-Apr-12",
-                    "close": 234.98,
-                    "open": 122.34
-                },
-                {
-                    "date": "19-Apr-12",
-                    "close": 345.44,
-                    "open": 134.56
-                },
-                {
-                    "date": "18-Apr-12",
-                    "close": 443.34,
-                    "open": 160.45
-                },
-                {
-                    "date": "17-Apr-12",
-                    "close": 543.7,
-                    "open": 180.34
-                },
-                {
-                    "date": "16-Apr-12",
-                    "close": 580.13,
-                    "open": 210.23
-                },
-                {
-                    "date": "13-Apr-12",
-                    "close": 605.23,
-                    "open": 223.45
-                },
-                {
-                    "date": "12-Apr-12",
-                    "close": 622.77,
-                    "open": 201.56
-                },
-                {
-                    "date": "11-Apr-12",
-                    "close": 626.2,
-                    "open": 212.67
-                },
-                {
-                    "date": "10-Apr-12",
-                    "close": 628.44,
-                    "open": 310.45
-                },
-                {
-                    "date": "9-Apr-12",
-                    "close": 636.23,
-                    "open": 350.45
-                },
-                {
-                    "date": "5-Apr-12",
-                    "close": 633.68,
-                    "open": 410.23
-                },
-                {
-                    "date": "4-Apr-12",
-                    "close": 624.31,
-                    "open": 430.56
-                },
-                {
-                    "date": "3-Apr-12",
-                    "close": 629.32,
-                    "open": 460.34
-                },
-                {
-                    "date": "2-Apr-12",
-                    "close": 618.63,
-                    "open": 510.34
-                },
-                {
-                    "date": "30-Mar-12",
-                    "close": 599.55,
-                    "open": 534.23
-                },
-                {
-                    "date": "29-Mar-12",
-                    "close": 609.86,
-                    "open": 578.23
-                },
-                {
-                    "date": "28-Mar-12",
-                    "close": 617.62,
-                    "open": 590.12
-                },
-                {
-                    "date": "27-Mar-12",
-                    "close": 614.48,
-                    "open": 560.34
-                },
-                {
-                    "date": "26-Mar-12",
-                    "close": 606.98,
-                    "open": 580.12
-                }
-            ]
-        // format the data
-        data.forEach(function (d) {
-            d.date = parseTime(d.date);
-            d.close = +d.close;
-            d.open = +d.open;
-        });
-
-        // Scale the range of the data
-        x.domain(d3.extent(data, function (d) { return d.date; }));
-        y.domain([0, d3.max(data, function (d) {
-            return Math.max(d.close, d.open);
-        })]);
-
-        // Add the valueline path.
-        svg.append("path")
-            .data([data])
-            .attr("class", "line")
-            .attr("d", valueline);
-
-        // Add the valueline2 path.
-        svg.append("path")
-            .data([data])
-            .attr("class", "line")
-            .style("stroke", "red")
-            .attr("d", valueline2);
-
-        // Add the X Axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-        // Add the Y Axis
-        svg.append("g")
-            .call(d3.axisLeft(y));
-
+            path.attr('transform', null)
+                .transition()
+                .duration(duration)
+                .ease(d3.easeLinear, 2)
+                .attr('transform', 'translate(' + x(globalX - max) + ')')
+                .on('end', tick)
+            // Remote old data (max 50 points)
+            if (data.length > width) data.shift();
+        }
+        tick();
 
     </script>
 </body>
