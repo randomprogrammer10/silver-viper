@@ -8,9 +8,8 @@ class DataController < ApplicationController
   VALID_METRICS = [TEMPERATURE, NOISE, PRESSURE, HUMIDITY, LIGHT].freeze
 
   def valid_params?(metrics)
-    metrics.each do |metric_key|
-      possible_metric = metrics[metric_key]
-      return false if !VALID_METRICS.include?(possible_metric)
+    metrics.keys.each do |metric|
+      return false if !VALID_METRICS.include?(metric)
     end
   end
 
