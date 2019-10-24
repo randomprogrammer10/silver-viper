@@ -1,0 +1,23 @@
+import requests
+
+
+class InfluxDBManager:
+    DB_URL = 'http://localhost:8086/write'
+    TABLE_NAME = 'weather_metrics'
+    POST_PARAMS = { "database": "silverviper" }
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def post_data(cls, data_dict):
+        payload = cls.format_influxdb_body(data_dict)
+        return requests.post(cls.DB_URL, params=cls.POST_PARAMS, data=payload)
+
+    @classmethod
+    def format_influxdb_body(cls, payload):
+        formatted_str_body = "{},".format(cls.TABLE_NAME)
+        for key, val in payload.items():
+            formatted_str_body += " {}={}".format(key, val)
+
+        return formatted_str_body
