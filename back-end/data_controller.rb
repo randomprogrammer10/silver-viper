@@ -5,20 +5,22 @@ class DataController
   HUMIDITY = 'humidity'.freeze
   LIGHT = 'light'.freeze
 
+  VALID_PARAMS = ['start_time', 'stop_time', 'metrics'].freeze
   VALID_METRICS = [TEMPERATURE, NOISE, PRESSURE, HUMIDITY, LIGHT].freeze
 
-  def valid_params?(metrics)
-    metrics.all? {|metric| VALID_METRICS.include?(metric)}
+  def valid_metrics?(metrics)
+    return true if metrics.nil?
+    metrics = metrics.strip.split(",")
+    metrics.all? { |metric| VALID_METRICS.include?(metric) }
   end
 
   def valid_timestamp?(start_time, stop_time)
-    return true if start_time.to_time < stop_time.to_time && start_time.to_time < Time.Now && stop_time.to_time < Time.Now
+    return false if start_time.nil? || stop_time.nil?
+    return false unless start_time.to_time < stop_time.to_time && start_time.to_time < Time.Now && stop_time.to_time < Time.Now
   end
 
-  def sanitize_params(metrics, start_time, stop_time)
-    return true if valid_params?(metrics) && valid_timestamp?(start_time, stop_time)
-  end
-
-  def connect_influxdb
+  def fetch_data(start_time, stop_time, metrics=nil)
+    metrics = VALID_METRICS if metrics.nil?
+    InfluxClient.new.get_weather_metric_data(metrics, start_time, stop_time)
   end
 end
