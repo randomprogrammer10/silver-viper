@@ -15,14 +15,17 @@ class EnvironmentMetrics:
     # PMS5003 data from air quality sensor
     PMS5003 = PMS5003()
 
+    def __init__(self):
+        
+
     # Get the temperature of the CPU for compensation
-    def get_cpu_temperature():
+    def get_cpu_temperature(self):
         process = Popen(['vcgencmd', 'measure_temp'], stdout=PIPE, universal_newlines=True)
         output, _error = process.communicate()
         return float(output[output.index('=') + 1:output.rindex("'")])
 
 
-    def calibrated_temp():
+    def calibrated_temp(self):
         cpu_temp = get_cpu_temperature()
         cpu_temps = [get_cpu_temperature()] * 5
 
@@ -35,7 +38,7 @@ class EnvironmentMetrics:
         return data
 
 
-    def build_metrics_dict():
+    def build_metrics_dict(self):
         pms_data = PMS5003.read()
         return {
             "temperature": calibrated_temp(),
