@@ -1,220 +1,164 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8" >
+    <meta charset="utf-8">
     <style type="text/css">
         /* Style Charts Here */
         .line {
             fill: none;
             stroke: steelblue;
-            stroke-width: 2px;
+            stroke-width: 1.5px;
         }
 
+        .legenditem {
+            float: left;
+            padding-right: 10px;
+        }
     </style>
 </head>
+
 <body>
+    <div id="legend" class="legend"></div>
+    <br>
+    <svg width="960" height="500" id="chart"></svg>
 
     <script src="js-libs/d3/d3.min.js"></script>
     <script>
-        // set the dimensions and margins of the graph
-        var margin = { top: 20, right: 20, bottom: 30, left: 50 },
-            width = window.innerWidth - margin.left - margin.right,
-            height = window.innerHeight - margin.top - margin.bottom;
+         var t = setInterval(updateChart, 1000);
 
-        // parse the date / time
-        var parseTime = d3.timeParse("%d-%b-%y");
+        var svg = d3.select("#chart"),
+            margin = {
+                top: 5,
+                right: 5,
+                bottom: 50,
+                left: 30
+            },
+            width = Math.floor(svg.attr("width") - margin.left - margin.right),
+            height = Math.floor(svg.attr("height") - margin.top - margin.bottom);
 
-        // set the ranges
-        var x = d3.scaleTime().range([0, width]);
-        var y = d3.scaleLinear().range([height, 0]);
+        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // define the 1st line
-        var valueline = d3.line()
-            .x(function (d) { return x(d.date); })
-            .y(function (d) { return y(d.close); });
+        g.append("defs").append("clipPath")
+            .attr("id", "clip2")
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", height);
 
-        // define the 2nd line
-        var valueline2 = d3.line()
-            .x(function (d) { return x(d.date); })
-            .y(function (d) { return y(d.open); });
+        var parseTime = d3.timeParse("%Y%m%d");
 
-        // append the svg obgect to the body of the page
-        // appends a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = d3.scaleOrdinal(d3.schemeCategory10);
 
-        const data = [
-                {
-                    "date": "1-May-12",
-                    "close": 68.13,
-                    "open": 34.12
-                },
-                {
-                    "date": "30-Apr-12",
-                    "close": 63.98,
-                    "open": 45.56
-                },
-                {
-                    "date": "27-Apr-12",
-                    "close": 67,
-                    "open": 67.89
-                },
-                {
-                    "date": "26-Apr-12",
-                    "close": 89.7,
-                    "open": 78.54
-                },
-                {
-                    "date": "25-Apr-12",
-                    "close": 99,
-                    "open": 89.23
-                },
-                {
-                    "date": "24-Apr-12",
-                    "close": 130.28,
-                    "open": 99.23
-                },
-                {
-                    "date": "23-Apr-12",
-                    "close": 166.7,
-                    "open": 101.34
-                },
-                {
-                    "date": "20-Apr-12",
-                    "close": 234.98,
-                    "open": 122.34
-                },
-                {
-                    "date": "19-Apr-12",
-                    "close": 345.44,
-                    "open": 134.56
-                },
-                {
-                    "date": "18-Apr-12",
-                    "close": 443.34,
-                    "open": 160.45
-                },
-                {
-                    "date": "17-Apr-12",
-                    "close": 543.7,
-                    "open": 180.34
-                },
-                {
-                    "date": "16-Apr-12",
-                    "close": 580.13,
-                    "open": 210.23
-                },
-                {
-                    "date": "13-Apr-12",
-                    "close": 605.23,
-                    "open": 223.45
-                },
-                {
-                    "date": "12-Apr-12",
-                    "close": 622.77,
-                    "open": 201.56
-                },
-                {
-                    "date": "11-Apr-12",
-                    "close": 626.2,
-                    "open": 212.67
-                },
-                {
-                    "date": "10-Apr-12",
-                    "close": 628.44,
-                    "open": 310.45
-                },
-                {
-                    "date": "9-Apr-12",
-                    "close": 636.23,
-                    "open": 350.45
-                },
-                {
-                    "date": "5-Apr-12",
-                    "close": 633.68,
-                    "open": 410.23
-                },
-                {
-                    "date": "4-Apr-12",
-                    "close": 624.31,
-                    "open": 430.56
-                },
-                {
-                    "date": "3-Apr-12",
-                    "close": 629.32,
-                    "open": 460.34
-                },
-                {
-                    "date": "2-Apr-12",
-                    "close": 618.63,
-                    "open": 510.34
-                },
-                {
-                    "date": "30-Mar-12",
-                    "close": 599.55,
-                    "open": 534.23
-                },
-                {
-                    "date": "29-Mar-12",
-                    "close": 609.86,
-                    "open": 578.23
-                },
-                {
-                    "date": "28-Mar-12",
-                    "close": 617.62,
-                    "open": 590.12
-                },
-                {
-                    "date": "27-Mar-12",
-                    "close": 614.48,
-                    "open": 560.34
-                },
-                {
-                    "date": "26-Mar-12",
-                    "close": 606.98,
-                    "open": 580.12
-                }
-            ]
-        // format the data
-        data.forEach(function (d) {
-            d.date = parseTime(d.date);
-            d.close = +d.close;
-            d.open = +d.open;
-        });
+        y.domain([0, 30]);
 
-        // Scale the range of the data
-        x.domain(d3.extent(data, function (d) { return d.date; }));
-        y.domain([0, d3.max(data, function (d) {
-            return Math.max(d.close, d.open);
-        })]);
+        var line = d3.line()
+            .curve(d3.curveBasis)
+            .x(function (d) {
+                return x(d.date);
+            })
+            .y(function (d) {
+                return y(d.speed);
+            });
 
-        // Add the valueline path.
-        svg.append("path")
-            .data([data])
-            .attr("class", "line")
-            .attr("d", valueline);
+        let dta = [
+            { id: "data1", values: [] },
+            { id: "data2", values: [] },
+            { id: "data3", values: [] },
+            { id: "data4", values: [] }
+        ];
 
-        // Add the valueline2 path.
-        svg.append("path")
-            .data([data])
-            .attr("class", "line")
-            .style("stroke", "red")
-            .attr("d", valueline2);
+        z.domain(dta.map(function (c) {
+            return c.id;
+        }));
 
-        // Add the X Axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+        var x_axis = d3.axisBottom()
+            .scale(x);
+        var x_axis_svg = g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")");
 
-        // Add the Y Axis
-        svg.append("g")
-            .call(d3.axisLeft(y));
+        x_axis_svg.call(x_axis);
 
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("fill", "#000")
+            .text("Speed");
+
+        let pathsG = g.append("g").attr("id", "paths").attr("class", "paths")
+            .attr("clip-path", "url(#clip2)");
+
+        let globalX = 0;
+        let duration = 1000; //how quickly to move (will look jerky if less that data input rate)
+        let limit = 60; // how many datapoints, total points = (duration * limit)
+
+        function updateChart() {
+
+            let now = new Date();
+            dta.forEach((e) => {
+                let last = e.values.length ? e.values[e.values.length - 1].speed : 10;
+                let newv = Math.round(Math.min(30, Math.max(0, last + (Math.random() * 6) - 3)));
+                e.values.push({
+                    date: now,
+                    speed: newv
+                });
+            });
+
+            // Shift domain
+            x.domain([now - ((limit - 2) * duration), now - duration])
+            // Slide x-axis left
+            x_axis_svg.transition().duration(duration).ease(d3.easeLinear, 2).call(x_axis);
+
+            //Join
+            var g = pathsG.selectAll(".minerLine").data(dta);
+            var gEnter = g.enter()
+                //Enter
+                .append("g")
+                .attr("class", "minerLine")
+                .merge(g);
+
+            //Join
+            var svg = g.selectAll("path").data(function (d) {
+                return [d];
+            });
+            svg.enter()
+                //Enter
+                .append("path").attr("class", "line")
+                .style("stroke", function (d) {
+                    return z(d.id);
+                })
+                .merge(svg)
+                //Update
+                .transition()
+                .duration(duration)
+                .ease(d3.easeLinear, 2)
+                .attr("d", function (d) {
+                    return line(d.values)
+                })
+                .attr("transform", null)
+
+            var text = d3.select("#legend").selectAll("div").data(dta)
+            text.enter()
+                .append("div")
+                .attr("class", "legenditem")
+                .style("color", function (d) {
+                    return z(d.id);
+                })
+                .merge(text)
+                .text(function (d) {
+                    return d.id + ":" + d.values[d.values.length - 1].speed;
+                })
+
+        }
+      </script>
 
     </script>
 </body>
