@@ -61,7 +61,7 @@ function initChart (params) {
         .attr("clip-path", "url(#clip2)");
 
     let globalX = 0;
-    let duration = 1000; //how quickly to move (will look jerky if less that data input rate)
+    let duration = 2000; //how quickly to move (will look jerky if less that data input rate)
     let limit = 60; // how many datapoints, total points = (duration * limit)
 
     function updateChart(json) {
@@ -133,5 +133,5 @@ function initChart (params) {
         }
         xhr.open("GET", "/tick", true);
         xhr.send();
-    }, 5000);
+    }, 2000);
 }
