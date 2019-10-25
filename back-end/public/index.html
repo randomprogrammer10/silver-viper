@@ -21,11 +21,10 @@
 <body>
     <div id="legend" class="legend"></div>
     <br>
-    <svg width="960" height="500" id="chart"></svg>
+    <svg id="chart"></svg>
 
     <script src="js-libs/d3/d3.min.js"></script>
     <script>
-         var t = setInterval(updateChart, 1000);
 
         var svg = d3.select("#chart"),
             margin = {
@@ -34,8 +33,12 @@
                 bottom: 50,
                 left: 30
             },
-            width = Math.floor(svg.attr("width") - margin.left - margin.right),
-            height = Math.floor(svg.attr("height") - margin.top - margin.bottom);
+            width = Math.floor(window.innerWidth - margin.left - margin.right),
+            height = Math.floor(window.innerHeight - margin.top - margin.bottom);
+        
+        svg
+        .attr('width', width)
+        .attr('height', height + 50);
 
         var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -46,8 +49,6 @@
             .attr("y", 0)
             .attr("width", width)
             .attr("height", height);
-
-        var parseTime = d3.timeParse("%Y%m%d");
 
         var x = d3.scaleTime().range([0, width]),
             y = d3.scaleLinear().range([height, 0]),
@@ -61,14 +62,15 @@
                 return x(d.date);
             })
             .y(function (d) {
-                return y(d.speed);
+                return y(d.value);
             });
-
+        
+        //TODO: edit to match incoming data
         let dta = [
-            { id: "data1", values: [] },
-            { id: "data2", values: [] },
-            { id: "data3", values: [] },
-            { id: "data4", values: [] }
+            { id: "data1", label: "data 1", values: [] },
+            { id: "data2", label: "data 2", values: [] },
+            { id: "data3", label: "data 3", values: [] },
+            { id: "data4", label: "data 4", values: [] }
         ];
 
         z.domain(dta.map(function (c) {
@@ -83,16 +85,6 @@
 
         x_axis_svg.call(x_axis);
 
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y))
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .attr("fill", "#000")
-            .text("Speed");
-
         let pathsG = g.append("g").attr("id", "paths").attr("class", "paths")
             .attr("clip-path", "url(#clip2)");
 
@@ -102,15 +94,17 @@
 
         function updateChart() {
 
+            //TODO: comment out block of code
             let now = new Date();
             dta.forEach((e) => {
                 let last = e.values.length ? e.values[e.values.length - 1].speed : 10;
                 let newv = Math.round(Math.min(30, Math.max(0, last + (Math.random() * 6) - 3)));
                 e.values.push({
                     date: now,
-                    speed: newv
+                    value: newv
                 });
             });
+            //end comment block
 
             // Shift domain
             x.domain([now - ((limit - 2) * duration), now - duration])
@@ -154,12 +148,26 @@
                 })
                 .merge(text)
                 .text(function (d) {
-                    return d.id + ":" + d.values[d.values.length - 1].speed;
+                    return d.label + ": " + d.values[d.values.length - 1].value;
                 })
 
         }
-      </script>
 
-    </script>
+        var t = setInterval(updateChart, 1000);
+
+        // TODO uncomment to use xhr
+        var d = setInterval(function (){
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //TODO: append data to dta need to know final format to  
+                    updateChart();
+                }
+            }
+            xhr.open("GET", "/tick", true);
+            xhr.send();
+        }, 5000);
+      </script>
 </body>
 </html>
