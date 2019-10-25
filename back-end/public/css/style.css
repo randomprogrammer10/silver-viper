@@ -1,0 +1,11 @@
+/* Style Charts Here */
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.legenditem {
+    float: left;
+    padding-right: 10px;
+}
