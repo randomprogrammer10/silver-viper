@@ -4,6 +4,8 @@ require 'time'
 
 require_relative 'data_controller'
 
+set :bind, '0.0.0.0'
+
 # Healthcheck
 get '/health' do
   [200, 'OK']
