@@ -67,7 +67,7 @@ function initChart (params) {
     function updateChart(json) {
 
         //TODO: comment out block of code
-        let now = new Date(json.time);
+        let now = new Date(json.time * 1000);
         dta.forEach((e) => {
             e.values.push({
                 date: now,
