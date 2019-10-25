@@ -6,19 +6,19 @@ iframe {
   width: 50%;
   height: 50%;
 }
-#top-left {
+#temperature_humidity {
   top: 0;
   left: 0;
 }
-#top-right {
+#light {
   top: 0;
   left: 50%;
 }
-#bottom-left {
+#gas {
   top: 50%;
   left: 0;
 }
-#bottom-right {
+#pm_per_dl {
   top: 50%;
   left: 50%;
 }
