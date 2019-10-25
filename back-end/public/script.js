@@ -71,7 +71,7 @@ function initChart (params, yDom) {
         dta.forEach((e) => {
             e.values.push({
                 date: now,
-                value: e.id,
+                value: json[e.id],
             });
         });
         //end comment block
