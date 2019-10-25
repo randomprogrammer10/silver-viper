@@ -25,7 +25,6 @@
 
     <script src="js-libs/d3/d3.min.js"></script>
     <script>
-        var t = setInterval(updateChart, 1000);
 
         var svg = d3.select("#chart"),
             margin = {
@@ -63,9 +62,10 @@
                 return x(d.date);
             })
             .y(function (d) {
-                return y(d.speed);
+                return y(d.value);
             });
-
+        
+        //TODO: edit to match incoming data
         let dta = [
             { id: "data1", label: "data 1", values: [] },
             { id: "data2", label: "data 2", values: [] },
@@ -94,15 +94,17 @@
 
         function updateChart() {
 
+            //TODO: comment out block of code
             let now = new Date();
             dta.forEach((e) => {
                 let last = e.values.length ? e.values[e.values.length - 1].speed : 10;
                 let newv = Math.round(Math.min(30, Math.max(0, last + (Math.random() * 6) - 3)));
                 e.values.push({
                     date: now,
-                    speed: newv
+                    value: newv
                 });
             });
+            //end comment block
 
             // Shift domain
             x.domain([now - ((limit - 2) * duration), now - duration])
@@ -146,15 +148,26 @@
                 })
                 .merge(text)
                 .text(function (d) {
-                    return d.label + ": " + d.values[d.values.length - 1].speed;
+                    return d.label + ": " + d.values[d.values.length - 1].value;
                 })
 
         }
 
-        var websocket = new WebSocket("/");
-        websocket.onmessage = function(event){
-            console.log(event.data);
-        }
+        var t = setInterval(updateChart, 1000);
+
+        // TODO uncomment to use xhr
+        var d = setInterval(function (){
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //TODO: append data to dta need to know final format to  
+                    updateChart();
+                }
+            }
+            xhr.open("GET", "/tick", true);
+            xhr.send();
+        }, 5000);
       </script>
 </body>
 </html>
