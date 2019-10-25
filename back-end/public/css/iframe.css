@@ -6,19 +6,19 @@ iframe {
   width: 50%;
   height: 50%;
 }
-#temperature_humidity {
+#top-left {
   top: 0;
   left: 0;
 }
-#light {
+#top-right {
   top: 0;
   left: 50%;
 }
-#gas_oxidizing_nh3 {
+#bottom-left {
   top: 50%;
   left: 0;
 }
-#gas_reducing {
+#bottom-right {
   top: 50%;
   left: 50%;
 }
