@@ -3,18 +3,13 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/iframe.css">
 </head>
 
 <body>
-    <div id="legend" class="legend"></div>
-    <br>
-    <svg id="chart"></svg>
-
-    <script src="js-libs/d3/d3.min.js"></script>
-    <script src="script.js"></script>
-    <script>
-       initChart(["humidity", "temperature"], 50);
-    </script>
+    <iframe id="temperature_humidity" src="temperature_humidity.html"></iframe>
+    <iframe id="light" src="light.html"></iframe>
+    <iframe id="gas_oxidizing_nh3" src="gas_oxidizing_nh3.html"></iframe>
+    <iframe id="gas_reducing" src="gas_reducing.html"></iframe>
 </body>
 </html>

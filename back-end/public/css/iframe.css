@@ -1,0 +1,24 @@
+iframe {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: none;
+  width: 50%;
+  height: 50%;
+}
+#temperature_humidity {
+  top: 0;
+  left: 0;
+}
+#light {
+  top: 0;
+  left: 50%;
+}
+#gas_oxidizing_nh3 {
+  top: 50%;
+  left: 0;
+}
+#gas_reducing {
+  top: 50%;
+  left: 50%;
+}
