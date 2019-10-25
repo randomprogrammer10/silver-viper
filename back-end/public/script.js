@@ -1,4 +1,4 @@
-function initChart (params) {
+function initChart (params, yDom) {
     var svg = d3.select("#chart"),
         margin = {
             top: 5,
@@ -27,7 +27,7 @@ function initChart (params) {
         y = d3.scaleLinear().range([height, 0]),
         z = d3.scaleOrdinal(d3.schemeCategory10);
 
-    y.domain([0, 50]);
+    y.domain([0, yDom]);
 
     var line = d3.line()
         .curve(d3.curveBasis)
