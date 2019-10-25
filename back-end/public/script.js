@@ -61,13 +61,13 @@ function initChart (params, yDom) {
         .attr("clip-path", "url(#clip2)");
 
     let globalX = 0;
-    let duration = 1000; //how quickly to move (will look jerky if less that data input rate)
+    let duration = 2000; //how quickly to move (will look jerky if less that data input rate)
     let limit = 60; // how many datapoints, total points = (duration * limit)
 
     function updateChart(json) {
 
         //TODO: comment out block of code
-        let now = new Date(json.time);
+        let now = new Date(json.time * 1000);
         dta.forEach((e) => {
             e.values.push({
                 date: now,
@@ -133,5 +133,5 @@ function initChart (params, yDom) {
         }
         xhr.open("GET", "/tick", true);
         xhr.send();
-    }, 5000);
+    }, 2000);
 }
