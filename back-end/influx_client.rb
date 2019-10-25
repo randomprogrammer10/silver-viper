@@ -1,8 +1,8 @@
 require 'influxdb'
 
 class InfluxClient
-  #HOST = '172.16.83.35'.freeze
-  HOST = 'localhost'.freeze
+  HOST = '172.16.83.35'.freeze
+  #HOST = 'localhost'.freeze
   PORT = '8086'.freeze
   RETRY_COUNT = 3
   TIME_OUT = 10
@@ -22,8 +22,8 @@ class InfluxClient
   private
 
   def generate_query_string(select_query, start, stop)
-    start = start.strftime('%Q').to_i * 1000000
-    stop = stop.strftime('%Q').to_i * 1000000
+    start = start.to_i * (10 ** 9)
+    stop = stop.to_i * (10 ** 9)
 
     "SELECT #{select_query} from #{TABLE_NAME} WHERE TIME > #{start} AND TIME <= #{stop}"
   end
