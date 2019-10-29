@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     backports (3.15.0)
+    dotenv (2.7.5)
     influxdb (0.7.0)
     multi_json (1.14.1)
     mustermann (1.0.3)
@@ -26,9 +27,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
   influxdb (~> 0.7.0)
   sinatra (~> 2.0)
   sinatra-contrib (~> 2.0)
 
 BUNDLED WITH
-   2.0.1
+   2.0.2

@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'time'
+require 'dotenv'
 
 require_relative 'data_controller'
 
