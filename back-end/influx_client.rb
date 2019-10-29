@@ -1,13 +1,13 @@
 require 'influxdb'
 
 class InfluxClient
-  HOST = '172.16.83.35'.freeze
-  #HOST = 'localhost'.freeze
-  PORT = '8086'.freeze
+  #HOST = '172.16.83.35'.freeze
+  HOST = (ENV['HOST_URL'] || '192.168.0.71').freeze
+  PORT = (ENV['PORT'] || '8086').freeze
   RETRY_COUNT = 3
   TIME_OUT = 10
-  DB_NAME = 'silverviper'.freeze
-  TABLE_NAME = 'weather_metrics'.freeze
+  DB_NAME = (ENV['DB_NAME'] || 'silverviper').freeze
+  TABLE_NAME = (ENV['TABLE_NAME'] || 'weather_metrics').freeze
 
   def initialize
     url = "http://#{HOST}:#{PORT}/#{DB_NAME}?retry=#{RETRY_COUNT}"
