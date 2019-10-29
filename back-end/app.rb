@@ -31,11 +31,11 @@ end
 get '/tick' do
   controller = DataController.new
 
-  # Return values for the last 6 seconds
+  # Return values for the last 2 seconds
   stop_time = Time.now
-  start_time = Time.now - 6
+  start_time = Time.now - 2
 
-  json controller.fetch_data(start_time, stop_time)
+  json controller.fetch_data(start_time, stop_time).last
 end
 
 # This is the default route that will be applied if there are no matches above
