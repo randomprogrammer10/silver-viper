@@ -67,16 +67,26 @@ function initChart (params, yDom) {
     function updateChart(json) {
 
         //TODO: comment out block of code
+        let yMin = 0;
+        let yMax = 0;
         let now = new Date(json.time * 1000);
         dta.forEach((e) => {
+            let value = json[e.id];
             e.values.push({
                 date: now,
-                value: json[e.id],
+                value: value,
             });
             if (e.values.length > 1000)
                 e.values.shift();
+            if (value < yMin)
+                yMin = value;
+            if (value > yMax)
+                yMax = value;
         });
         //end comment block
+
+        let scale = 1.2;
+        y.domain([yMin * scale, yMax * scale]);
 
         // Shift domain
         x.domain([now - ((limit - 2) * duration), now - duration])

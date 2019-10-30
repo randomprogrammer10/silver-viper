@@ -8,7 +8,7 @@ from enviroplus import gas
 class EnvironmentMetrics:
     # Adjust this to calibrate temperature
     # TEMP_TUNING_FACTOR = 0.8 # This is the tuning factor if it is the box
-    TEMP_TUNING_FACTOR = 3.0 # This is the tuningh factor for out of the box (for now)
+    TEMP_TUNING_FACTOR = 4.0 # This is the tuningh factor for out of the box (for now)
 
     # bme280 temperature/pressure/humidity sensor
     BME280_INSTANCE = BME280()
