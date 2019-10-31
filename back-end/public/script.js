@@ -79,7 +79,7 @@ function initChart (params, yDom) {
               e.values.shift();
             }
             e.min = (e.min === null || value < e.min) ? value : e.min
-            e.max = (e.max === null || value < e.max) ? value : e.max
+            e.max = (e.max === null || value > e.max) ? value : e.max
         });
 
         let yMin = Math.min(0, ...dta.map((e) => { return e.min }));
