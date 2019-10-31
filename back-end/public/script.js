@@ -82,8 +82,8 @@ function initChart (params, yDom) {
             e.max = (e.max === null || value < e.max) ? value : e.max
         });
 
-        let yMin = Math.min(dta.map((e) => { return e.min }));
-        let yMax = Math.max(dta.map((e) => { return e.max }));
+        let yMin = Math.min(...dta.map((e) => { return e.min }));
+        let yMax = Math.max(...dta.map((e) => { return e.max }));
 
         let scale = 1.2;
         y.domain([yMin * scale, yMax * scale]);
