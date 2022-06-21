@@ -1,7 +1,7 @@
 ads1015==0.0.4
 i2cdevice==0.0.6
 ltr559==0.1.0
-numpy==1.17.3
+numpy==1.22.0
 pimoroni-bme280==0.0.2
 pms5003==0.0.4
 pyserial==3.4
